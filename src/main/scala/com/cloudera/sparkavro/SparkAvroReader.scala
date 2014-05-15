@@ -28,48 +28,25 @@ import org.apache.avro.mapreduce.{AvroKeyInputFormat, AvroJob}
 import org.apache.avro.mapred.AvroKey
 import org.apache.hadoop.io.NullWritable
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
+import org.apache.avro.Schema
 
 object SparkAvroReader {
-  class MyRegistrator extends KryoRegistrator {
-    override def registerClasses(kryo: Kryo) {
-      kryo.register(classOf[GenericData.Record])
-    }
-  }
-
   def main(args: Array[String]) {
     val inPath = args(0)
 
     val sparkConf = new SparkConf().setAppName("Spark Avro")
-    sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-    sparkConf.set("spark.kryo.registrator", classOf[MyRegistrator].getName)
     val sc = new SparkContext(sparkConf)
-
-    val schema = new Parser().parse(this.getClass.getClassLoader
-      .getResourceAsStream("user.avsc"))
 
     val conf = new Job()
     FileInputFormat.setInputPaths(conf, inPath)
-    AvroJob.setInputKeySchema(conf, schema)
     val records = sc.newAPIHadoopRDD(conf.getConfiguration,
       classOf[AvroKeyInputFormat[GenericData.Record]],
       classOf[AvroKey[GenericData.Record]],
       classOf[NullWritable])
-    val localRecords = records.collect()
-//    println("localRecords(0): " + localRecords(0))
-    println("more: " + localRecords(0).getClass)
-    println("more: " + localRecords(0).getClass.getCanonicalName)
-    println("more: " + localRecords(0)._1.getClass)
-    println("more: " + localRecords(0)._1.getClass.getCanonicalName)
-    println("more: " + localRecords(0)._1.datum.getClass)
-    println("more: " + localRecords(0)._1.datum.getClass.getCanonicalName)
-    println("more: " + localRecords(0)._1.datum.get("name"))
-    println("more: " + localRecords(0)._1.datum.get("favorite_color"))
-    println("more: " + localRecords(0)._1.datum.get("favorite_number"))
-    println("more: " + localRecords(0)._2.getClass)
-    println("more: " + localRecords(0)._2.getClass.getCanonicalName)
-    println("more: " + localRecords(0)._1)
-    println("more: " + localRecords(0)._2)
 
-    println("num records: " + records.count())
+    val colorsAndNames = records.map(x =>
+      (x._1.datum.get("name"), x._1.datum.get("favorite_color")))
+
+    println("colors and names: " + colorsAndNames.collect())
   }
 }
