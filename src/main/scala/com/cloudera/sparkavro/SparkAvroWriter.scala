@@ -18,9 +18,6 @@
 
 package com.cloudera.sparkavro
 
-import com.esotericsoftware.kryo.Kryo
-
-import org.apache.spark.serializer.KryoRegistrator
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
@@ -34,19 +31,11 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
 import org.apache.hadoop.mapreduce.Job
 import org.apache.avro.mapred.AvroKey
 
-class MyRegistrator extends KryoRegistrator {
-  override def registerClasses(kryo: Kryo) {
-    kryo.register(classOf[GenericData.Record])
-  }
-}
-
 object SparkAvroWriter {
   def main(args: Array[String]) {
     val outPath = args(0)
 
     val sparkConf = new SparkConf().setAppName("Spark Avro")
-    sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-    sparkConf.set("spark.kryo.registrator", classOf[MyRegistrator].getName)
     val sc = new SparkContext(sparkConf)
 
     val schema = new Parser().parse(this.getClass.getClassLoader

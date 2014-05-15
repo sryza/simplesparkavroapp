@@ -19,16 +19,12 @@
 package com.cloudera.sparkavro
 
 import org.apache.spark.{SparkContext, SparkConf}
-import org.apache.spark.serializer.KryoRegistrator
-import com.esotericsoftware.kryo.Kryo
 import org.apache.avro.generic.GenericData
-import org.apache.avro.Schema.Parser
 import org.apache.hadoop.mapreduce.Job
-import org.apache.avro.mapreduce.{AvroKeyInputFormat, AvroJob}
+import org.apache.avro.mapreduce.AvroKeyInputFormat
 import org.apache.avro.mapred.AvroKey
 import org.apache.hadoop.io.NullWritable
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
-import org.apache.avro.Schema
 
 object SparkAvroReader {
   def main(args: Array[String]) {
@@ -47,6 +43,6 @@ object SparkAvroReader {
     val colorsAndNames = records.map(x =>
       (x._1.datum.get("name"), x._1.datum.get("favorite_color")))
 
-    println("colors and names: " + colorsAndNames.collect())
+    println("colors and names: " + colorsAndNames.collect().mkString(","))
   }
 }
