@@ -18,20 +18,21 @@
 
 package com.cloudera.sparkavro
 
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
-import org.apache.spark.SparkConf
-import org.apache.avro.mapreduce.{AvroKeyOutputFormat, AvroJob}
 import org.apache.avro.Schema.Parser
-
 import org.apache.avro.generic.GenericData
+import org.apache.avro.mapred.AvroKey
+import org.apache.avro.mapreduce.{AvroKeyOutputFormat, AvroJob}
+
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.io.NullWritable
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
 import org.apache.hadoop.mapreduce.Job
-import org.apache.avro.mapred.AvroKey
 
-object SparkAvroWriter {
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+import org.apache.spark.SparkConf
+
+object SparkGenericAvroWriter {
   def main(args: Array[String]) {
     val outPath = args(0)
 

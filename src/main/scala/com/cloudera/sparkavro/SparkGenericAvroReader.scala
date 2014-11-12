@@ -18,15 +18,17 @@
 
 package com.cloudera.sparkavro
 
-import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.avro.generic.GenericData
-import org.apache.hadoop.mapreduce.Job
-import org.apache.avro.mapreduce.AvroKeyInputFormat
 import org.apache.avro.mapred.AvroKey
+import org.apache.avro.mapreduce.AvroKeyInputFormat
+
 import org.apache.hadoop.io.NullWritable
+import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 
-object SparkAvroReader {
+import org.apache.spark.{SparkContext, SparkConf}
+
+object SparkGenericAvroReader {
   def main(args: Array[String]) {
     val inPath = args(0)
 
