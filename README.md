@@ -1,4 +1,4 @@
-simplesparkavroapp
+Spark with Avro and Parquet
 ==================
 
 Enclosed is a simple Spark app demonstrating how to read and write data in the Parquet and Avro
