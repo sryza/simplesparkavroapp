@@ -20,18 +20,19 @@ package com.cloudera.sparkavro
 
 import com.esotericsoftware.kryo.Kryo
 
-import org.apache.spark.serializer.KryoRegistrator
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
-import org.apache.spark.SparkConf
-import org.apache.avro.mapreduce.{AvroKeyOutputFormat, AvroJob}
 import org.apache.avro.Schema.Parser
+import org.apache.avro.mapred.AvroKey
+import org.apache.avro.mapreduce.{AvroJob, AvroKeyOutputFormat}
 
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.io.NullWritable
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
 import org.apache.hadoop.mapreduce.Job
-import org.apache.avro.mapred.AvroKey
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
+
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+import org.apache.spark.SparkConf
+import org.apache.spark.serializer.{KryoSerializer, KryoRegistrator}
 
 object SparkSpecificAvroWriter {
   class MyRegistrator extends KryoRegistrator {
@@ -44,12 +45,9 @@ object SparkSpecificAvroWriter {
     val outPath = args(0)
 
     val sparkConf = new SparkConf().setAppName("Spark Avro")
-    sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+    sparkConf.set("spark.serializer", classOf[KryoSerializer].getName)
     sparkConf.set("spark.kryo.registrator", classOf[MyRegistrator].getName)
     val sc = new SparkContext(sparkConf)
-
-    val schema = new Parser().parse(this.getClass.getClassLoader
-      .getResourceAsStream("user.avsc"))
 
     val user1 = new User("Alyssa", 256, null)
     val user2 = new User("Ben", 7, "red")
@@ -59,6 +57,7 @@ object SparkSpecificAvroWriter {
 
     val conf = new Job()
     FileOutputFormat.setOutputPath(conf, new Path(outPath))
+    val schema = new Parser().parse(getClass.getClassLoader.getResourceAsStream("user.avsc"))
     AvroJob.setOutputKeySchema(conf, schema)
     conf.setOutputFormatClass(classOf[AvroKeyOutputFormat[User]])
     withValues.saveAsNewAPIHadoopDataset(conf.getConfiguration)
