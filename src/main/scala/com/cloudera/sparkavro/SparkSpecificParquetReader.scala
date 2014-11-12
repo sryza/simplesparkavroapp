@@ -17,31 +17,22 @@
  */
 package com.cloudera.sparkavro
 
-import com.esotericsoftware.kryo.Kryo
 
 import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 
 import org.apache.spark.{SparkContext, SparkConf}
-import org.apache.spark.serializer.{KryoSerializer, KryoRegistrator}
 
 import parquet.hadoop.ParquetInputFormat
 
 import parquet.avro.AvroReadSupport
 
 object SparkSpecificParquetReader {
-  class MyRegistrator extends KryoRegistrator {
-    override def registerClasses(kryo: Kryo) {
-      kryo.register(classOf[User])
-    }
-  }
-
   def main(args: Array[String]) {
     val inPath = args(0)
 
     val sparkConf = new SparkConf().setAppName("Spark Avro")
-    sparkConf.set("spark.serializer", classOf[KryoSerializer].getName)
-    sparkConf.set("spark.kryo.registrator", classOf[MyRegistrator].getName)
+    MyKryoRegistrator.register(sparkConf)
     val sc = new SparkContext(sparkConf)
 
     val conf = new Job()

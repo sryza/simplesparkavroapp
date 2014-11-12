@@ -18,8 +18,6 @@
 
 package com.cloudera.sparkavro
 
-import com.esotericsoftware.kryo.Kryo
-
 import org.apache.avro.Schema.Parser
 
 import org.apache.hadoop.fs.Path
@@ -29,23 +27,15 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
-import org.apache.spark.serializer.{KryoSerializer, KryoRegistrator}
 
 import parquet.avro.AvroParquetOutputFormat
 
 object SparkSpecificParquetWriter {
-  class MyRegistrator extends KryoRegistrator {
-    override def registerClasses(kryo: Kryo) {
-      kryo.register(classOf[User])
-    }
-  }
-
   def main(args: Array[String]) {
     val outPath = args(0)
 
     val sparkConf = new SparkConf().setAppName("Spark Avro")
-    sparkConf.set("spark.serializer", classOf[KryoSerializer].getName)
-    sparkConf.set("spark.kryo.registrator", classOf[MyRegistrator].getName)
+    MyKryoRegistrator.register(sparkConf)
     val sc = new SparkContext(sparkConf)
 
     val user1 = new User("Alyssa", 256, null)
