@@ -8,6 +8,7 @@
  
   <properties>
     <avro.version>1.7.6</avro.version>
+    <parquet.version>1.5.0-cdh5.2.0</parquet.version>
   </properties>
 
   <repositories>
@@ -112,6 +113,11 @@
       <artifactId>spark-core_2.10</artifactId>
       <version>1.1.0</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.twitter</groupId>
+      <artifactId>parquet-avro</artifactId>
+      <version>${parquet.version}</version>
     </dependency>
   </dependencies>
 </project>
