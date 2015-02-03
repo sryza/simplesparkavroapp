@@ -18,16 +18,11 @@
 
 package com.cloudera.sparkavro
 
-import org.apache.avro.Schema.Parser
-
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
-
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
-
 import parquet.avro.AvroParquetOutputFormat
 
 object SparkSpecificParquetWriter {
@@ -45,7 +40,7 @@ object SparkSpecificParquetWriter {
 
     val conf = new Job()
     FileOutputFormat.setOutputPath(conf, new Path(outPath))
-    val schema = new Parser().parse(getClass.getClassLoader.getResourceAsStream("user.avsc"))
+    val schema = User.SCHEMA$
     AvroParquetOutputFormat.setSchema(conf, schema)
     conf.setOutputFormatClass(classOf[AvroParquetOutputFormat])
     records.map((x) => (null, x)).saveAsNewAPIHadoopDataset(conf.getConfiguration)
